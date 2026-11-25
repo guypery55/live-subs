@@ -1,0 +1,12 @@
+.build/
+SubsCore/.build/
+dist/
+*.p12
+*.cer
+*.key
+*.pem
+signing/
+.env
+spike/clips/
+.DS_Store
+__pycache__/
