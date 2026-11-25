@@ -37,7 +37,8 @@ Requires macOS 13 (Ventura) or newer, on Intel or Apple Silicon.
      scroll down to "LiveSubs was blocked…", click **Open Anyway**, then enter the Mac's password.
    - **macOS 13–14:** right-click (or Control-click) LiveSubs → **Open** → **Open**.
 
-   This only happens once.
+   This only happens once. If there's no "Open Anyway" button, open **Terminal** and run
+   `xattr -dr com.apple.quarantine /Applications/LiveSubs.app`, then open LiveSubs again.
 
 ### 3. The setup window
 
