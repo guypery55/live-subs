@@ -35,7 +35,14 @@ if [ -n "${SIGN_P12_BASE64:-}" ]; then
   security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k "$KC_PASS" "$KEYCHAIN" >/dev/null
   security list-keychains -d user -s "$KEYCHAIN" $(security list-keychains -d user | tr -d '"')
   rm -f "$RUNNER_TEMP/sign.p12"
-  # Self-signed, so it isn't "trusted": pick it by its SHA-1 hash rather than by name.
+  # codesign can refuse an untrusted self-signed identity; on the throwaway CI machine, mark
+  # it trusted for code signing (this changes nothing on the friend's Mac).
+  if [ -n "${CI:-}" ]; then
+    security find-certificate -c "LiveSubs Self-Signed" -p "$KEYCHAIN" > "$RUNNER_TEMP/sign.pem"
+    sudo security add-trusted-cert -d -r trustRoot -p codeSign \
+      -k /Library/Keychains/System.keychain "$RUNNER_TEMP/sign.pem"
+  fi
+  # Pick the identity by its SHA-1 hash rather than by name.
   IDENTITY="$(security find-identity -p codesigning "$KEYCHAIN" | awk '/\)/ {print $2; exit}')"
   echo "Signing with certificate $IDENTITY"
   codesign --force --timestamp=none --keychain "$KEYCHAIN" --sign "$IDENTITY" \
